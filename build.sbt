@@ -15,7 +15,9 @@ resolvers ++= Seq (
         "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
-publishTo := Some(FileRepository("Groosker Repo", Resolver.defaultFileConfiguration, Patterns(Option(System.getProperty("publish.dir")).getOrElse(System.getProperty("user.dir")) + "[organisation]/[module]/[revision]/[module]-[revision].[artifact]")))
+
+
+publishTo := Some(FileRepository("Groosker Repo", Resolver.defaultFileConfiguration, Patterns(true, Option(System.getProperty("publish.dir")).getOrElse(System.getProperty("user.dir")) + "/[organization]/[module](_[scalaVersion])/[revision]/[artifact](_[scalaVersion])-[revision](-[classifier]).[ext]")))
 
 {
 libraryDependencies ++= Seq (
@@ -25,4 +27,3 @@ libraryDependencies ++= Seq (
         "se.scalablesolutions.akka" % "akka-actor" % "1.2", 
         "se.scalablesolutions.akka" % "akka-remote" % "1.2")
 }
-
