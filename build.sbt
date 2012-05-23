@@ -5,7 +5,7 @@ name := "Groosker Payment API"
 
 version := "1.1-SNAPSHOT"
 
-organization := "Groosker"
+organization := "com.groosker"
 
 scalaVersion := "2.9.1"
 
@@ -15,6 +15,8 @@ resolvers ++= Seq (
         "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
+publishTo := Some(FileRepository("Groosker Repo", Resolver.defaultFileConfiguration, Patterns(Option(System.getProperty("publish.dir")).getOrElse(System.getProperty("user.dir")) + "[organisation]/[module]/[revision]/[module]-[revision].[artifact]")))
+
 {
 libraryDependencies ++= Seq (
         "net.databinder" %% "dispatch-http" % "[0.7.7, )",     
@@ -23,3 +25,4 @@ libraryDependencies ++= Seq (
         "se.scalablesolutions.akka" % "akka-actor" % "1.2", 
         "se.scalablesolutions.akka" % "akka-remote" % "1.2")
 }
+
