@@ -3,7 +3,7 @@ import Keys._
 
 name := "Groosker Payment API"
 
-version := "1.1-SNAPSHOT"
+version := "1.1.1-SNAPSHOT"
 
 organization := "com.groosker"
 
@@ -24,6 +24,8 @@ libraryDependencies ++= Seq (
         "net.databinder" %% "dispatch-http" % "[0.7.7, )",     
         "net.databinder" %% "dispatch-mime" % "[0.7.7, )",
         "org.specs2" %% "specs2" % "1.9" % "test",     
+        "junit" % "junit" % "4.7" % "test",
+        "net.liftweb" %% "lift-json" % "2.5-SNAPSHOT",
         "se.scalablesolutions.akka" % "akka-actor" % "1.2", 
         "se.scalablesolutions.akka" % "akka-remote" % "1.2")
 }

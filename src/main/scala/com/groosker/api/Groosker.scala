@@ -1,45 +1,101 @@
 package com.groosker.api
 
+import dispatch._
+import dispatch.Http._
+import scala.io.Source
+
 object Currency extends Enumeration {
   //type Currency = Value
   val CHF, USD, EUR = Value
 }
 
-case class PaymentRequestDetails(id: String, url: String)
+case class PaymentRequestDetails(code: String, url: String)
+abstract class PaymentResult
+case object PaymentAccepted extends PaymentResult
+case object PaymentDeclined extends PaymentResult
+case object PaymentTimedOut extends PaymentResult
 
 sealed abstract class GrooskerAbstract {
   val apiKey: String
-  val merchantId: String
-  final val Version = "1"
-  val host: String
-  final val generateRefUrl = host + "getpaid/ref/create"
-  final val imageUrl = host + "getpaid/ref/qrcode"
+  final val version = "1"
+  def baseUrl: String
+  def secure: Boolean
 
   import Currency._
-  def createPaymentRequest(amount: BigDecimal, currency: Currency.Value, description: String): PaymentRequestDetails = {
-    println("Requested payment: %.2f %s - %s" format (amount, currency, description))
-    PaymentRequestDetails("123123123", "http://groosker.com/img/grooskerqr.png")
+  def createPaymentRequest(amount: BigDecimal, currency: Currency.Value, description: String, details: String): Option[PaymentRequestDetails] = {
+    val http = new Http
+    val req = url(baseUrl) / requestPaymentUrl.tail.mkString("/") << Map(
+      "api_key" -> "123456789",
+      "version" -> version,
+      "currency" -> currency.toString,
+      "description" -> description,
+      "details" -> details,
+      "amount" -> amount.toString)
+
+    http x (req >|) {
+      case (code, x, y, z) =>
+        if (code == 200) {
+          val txt = Source.fromInputStream(y.get.getContent).getLines.next
+          import net.liftweb.json._
+          implicit val formats = DefaultFormats
+          val json = parse(txt)
+          println(txt)
+          Some(json.extract[PaymentRequestDetails])
+        } else None
+    }
   }
 
-  def awaitPayment(paymentId: String): Boolean = false
+  def acceptTestPayment(code: String) = {
+    val http = new Http
+    val req = url(baseUrl) / acceptTestPaymentUrl.tail.mkString("/") << Map(
+      "api_key" -> "123456789",
+      "version" -> version,
+      "code" -> code)
+    http x (req >|) {
+      case (code, x, y, z) =>
+        if (code == 200) {
+          val txt = Source.fromInputStream(y.get.getContent).getLines.next
+          import net.liftweb.json._
+          println(txt)
+          implicit val formats = DefaultFormats
+          val json = parse(txt)
+          Some(json.extract[PaymentRequestDetails])
+        } else {
+          println(code)
+          None
+        }
+    }
 
-  import dispatch._
+  }
 
-  def generateRef(amount: BigDecimal, currency: String, receiver: String, details: String): Request = url(generateRefUrl) << Map(
-    "amount" -> amount.toString,
-    "currency" -> currency,
-    "receiver" -> receiver,
-    "details" -> details,
-    "version" -> Version)
+  def awaitPayment(paymentId: String): PaymentResult = {
+    val http = new Http
+    val req = url(baseUrl) / awaitPaymentUrl.tail.mkString("/") << Map(
+      "api_key" -> "123456789",
+      "version" -> version,
+      "code" -> paymentId)
+    http x (req >|) {
+      case (code, x, y, z) =>
+        if (code == 200) {
+          val txt = Source.fromInputStream(y.get.getContent).getLines.next
+          import net.liftweb.json._
+          implicit val formats = DefaultFormats
+          val json = parse(txt)
+          Some(json.extract[PaymentRequestDetails])
+          PaymentAccepted
+        } else PaymentDeclined
+    }
 
-  def image(ref: String): Request = url(imageUrl) << Map("code" -> ref, "version" -> Version)
+  }
 
 }
 
 abstract class GrooskerTest extends GrooskerAbstract {
-  final val host = "http://localhost:8080/api/"
+  final val baseUrl = "http://localhost:8080/api/"
+  val secure = false
 }
 
 abstract class Groosker extends GrooskerAbstract {
-  final val host = "https://spendchart.no/api/"
+  final val baseUrl = "https://api.spendchart.no/"
+  val secure = true
 }
