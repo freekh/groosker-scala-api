@@ -96,6 +96,6 @@ abstract class GrooskerTest extends GrooskerAbstract {
 }
 
 abstract class Groosker extends GrooskerAbstract {
-  final val baseUrl = "https://api.spendchart.no/"
+  final val baseUrl = "https://api.groosker.com/"
   val secure = true
 }
