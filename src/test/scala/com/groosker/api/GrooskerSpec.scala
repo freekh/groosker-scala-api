@@ -17,7 +17,7 @@ class GrooskerSpec extends Specification {
       url must contain("/api/image/")
       url must contain(code)
       Future { Thread.sleep(5000); g.acceptTestPayment(code) }
-      g.awaitPayment(code) must be(PaymentAccepted)
+      g.awaitPayment(code) must be(PaymentResult.Accepted)
     }
   }
 
