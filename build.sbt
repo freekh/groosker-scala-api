@@ -7,8 +7,6 @@ version := "1.1.1-SNAPSHOT"
 
 organization := "com.groosker"
 
-scalaVersion := "2.9.1"
-
 resolvers ++= Seq (
         "erisRepo" at "http://88.198.24.198/maven/", 
         ScalaToolsSnapshots, ScalaToolsReleases, DefaultMavenRepository,
@@ -25,7 +23,7 @@ libraryDependencies ++= Seq (
         "net.databinder" %% "dispatch-mime" % "[0.7.7, )",
         "org.specs2" %% "specs2" % "1.9" % "test",     
         "junit" % "junit" % "4.7" % "test",
-        "net.liftweb" %% "lift-json" % "2.5-SNAPSHOT",
+        "net.liftweb" %% "lift-json" % "2.4",
         "se.scalablesolutions.akka" % "akka-actor" % "1.2", 
         "se.scalablesolutions.akka" % "akka-remote" % "1.2")
 }
