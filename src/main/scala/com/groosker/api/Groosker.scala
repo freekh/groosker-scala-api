@@ -38,7 +38,7 @@ sealed abstract class GrooskerAbstract {
   import Currency._
   def createPaymentRequest(amount: BigDecimal, currency: Currency.Value, description: String, details: String): Option[PaymentRequestDetails] = {
     val http = new Http
-    val params = RequestPayment.paramDef.params zip Seq(apiKey, version, amount.toString, currency.toString, "receiver", details)
+    val params = RequestPayment.paramDef.params zip Seq(apiKey, version, amount.toString, currency.toString, details)
     val req = url(baseUrl) / RequestPayment.apiCall << params
 
     http x (req >|) {

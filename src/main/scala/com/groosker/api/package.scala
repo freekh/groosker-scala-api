@@ -33,9 +33,9 @@ package object api {
     val apiCall = "request_payment"
     def getResult(inParams: ParamsMap) = checkRequired(inParams).toLeft(new ApiResult)
     val paramDef = new {
-      val callParams = List("amount", "currency", "receiver", "details")
+      val callParams = List("amount", "currency", "details", "shipping")
     } with Params {
-      val List(amount, currency, receiver, details) = callParams
+      val List(amount, currency, details, shipping) = callParams
       val result = List("code", "url")
       val List(code, url) = result
     }
