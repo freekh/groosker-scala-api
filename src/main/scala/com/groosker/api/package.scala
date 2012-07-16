@@ -73,4 +73,7 @@ package object api {
       val result = List("result")
     }
   }
+
+  private val upayUrls = List("requestPayment", "generateQRCode", "awaitPayment", "acceptTestPayment", "declineTestPayment") map { url => List("api", url) }
+  val List(requestPaymentUrl, generateQRCodeUrl, awaitPaymentUrl, acceptTestPaymentUrl, declineTestPaymentUrl) = upayUrls
 }
