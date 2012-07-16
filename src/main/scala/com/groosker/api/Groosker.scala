@@ -6,7 +6,7 @@ import scala.io.Source
 
 object Currency extends Enumeration {
   //type Currency = Value
-  val CHF, USD, EUR = Value
+  val USD, EUR, GBP, CHF, NOK = Value
 }
 
 import java.util.{ Date, Calendar }
