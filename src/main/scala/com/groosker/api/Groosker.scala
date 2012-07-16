@@ -9,6 +9,8 @@ object Currency extends Enumeration {
   val CHF, USD, EUR = Value
 }
 
+import java.util.{ Date, Calendar }
+
 case class PaymentRequestDetails(code: String, url: String)
 case class AwaitPaymentResult(result: String) {
   import PaymentResult._
@@ -36,21 +38,15 @@ sealed abstract class GrooskerAbstract {
   import Currency._
   def createPaymentRequest(amount: BigDecimal, currency: Currency.Value, description: String, details: String): Option[PaymentRequestDetails] = {
     val http = new Http
-    val req = url(baseUrl) / requestPaymentUrl.tail.mkString("/") << Map(
-      "api_key" -> apiKey,
-      "version" -> version,
-      "currency" -> currency.toString,
-      "description" -> description,
-      "details" -> details,
-      "amount" -> amount.toString)
+    val params = RequestPayment.paramDef.params zip Seq(apiKey, version, amount.toString, currency.toString, "receiver", details)
+    val req = url(baseUrl) / RequestPayment.apiCall << params
 
     http x (req >|) {
       case (200, _, y, _) =>
-        val txt = Source.fromInputStream(y.get.getContent).getLines.next
+        val txt = Source.fromInputStream(y.get.getContent).getLines.mkString("\n")
         import net.liftweb.json._
         implicit val formats = DefaultFormats
         val json = parse(txt)
-        println(json)
         Some(json.extract[PaymentRequestDetails])
       case (code, _, y, _) =>
         None
@@ -59,10 +55,8 @@ sealed abstract class GrooskerAbstract {
 
   def acceptTestPayment(code: String) = {
     val http = new Http
-    val req = url(baseUrl) / acceptTestPaymentUrl.tail.mkString("/") << Map(
-      "api_key" -> apiKey,
-      "version" -> version,
-      "code" -> code)
+    val params = AcceptTestPayment.paramDef.params zip (List(apiKey, version, code))
+    val req = url(baseUrl) / AcceptTestPayment.apiCall << params
     http x (req >|) {
       case (code, x, y, z) =>
         if (code == 200) {
@@ -81,10 +75,8 @@ sealed abstract class GrooskerAbstract {
 
   def awaitPayment(paymentId: String): PaymentResult = {
     val http = new Http
-    val req = url(baseUrl) / awaitPaymentUrl.tail.mkString("/") << Map(
-      "api_key" -> apiKey,
-      "version" -> version,
-      "code" -> paymentId)
+    val params = AwaitPayment.paramDef.params zip (List(apiKey, version, paymentId))
+    val req = url(baseUrl) / AwaitPayment.apiCall << params
     http x (req >|) {
       case (200, x, y, z) =>
         val txt = Source.fromInputStream(y.get.getContent).getLines.mkString("\n")

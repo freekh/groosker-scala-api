@@ -1,57 +1,75 @@
 package com.groosker
 
 package object api {
+  type ParamsMap = Map[String, String]
+
+  case class ApiPostRequest(command: String, params: ParamsMap)
 
   abstract class Params {
-    val params = commonParams ++ callParams
+    val mainParams = List("api_key", "version")
+    val commonParams = mainParams
     val callParams: List[String]
+    val params = commonParams ++ callParams
     val result: List[String]
-    val commonParams = List("api_key", "version")
-    val List(apiKey, version) = commonParams
-  }
-  abstract class ApiUrl {
-    def url: String
-    def params: Params
-    //    def unapply(x: Any) = x match {
-    //      case r @ Req(List("api", `url`), _, PostRequest) => Some(r, r.paramNames.toSet)
-    //      case _ => None
-    //    }
-
+    val List(apiKey, version) = mainParams
   }
 
-  object RequestPayment extends ApiUrl {
-    val url = "request_payment"
-    object params extends Params {
+  abstract class ApiCall {
+    def apiCall: String
+    def paramDef: Params
+    def getResult(x: ParamsMap): Either[String, ApiResult]
+    def checkRequired(inParams: ParamsMap): Option[String] =
+      if (paramDef.params.forall(inParams.contains(_)))
+        None else Some("Not the right params. Missing: " + paramDef.params.diff(inParams.keys.toSeq).mkString("", ", ", "."))
+    def unapply(x: Any) = x match {
+      case r @ ApiPostRequest(cmd, params) if cmd == apiCall =>
+        getResult(params).fold({ error => println(error); None }, res => Some(res))
+      case _ => None
+    }
+  }
+  class ApiResult
+
+  object RequestPayment extends ApiCall {
+    val apiCall = "request_payment"
+    def getResult(inParams: ParamsMap) = checkRequired(inParams).toLeft(new ApiResult)
+    val paramDef = new {
       val callParams = List("amount", "currency", "receiver", "details")
-      val List(amount, currency, receiver, details) = params
+    } with Params {
+      val List(amount, currency, receiver, details) = callParams
       val result = List("code", "url")
       val List(code, url) = result
     }
   }
 
-  object AwaitPayment extends ApiUrl {
-    val url = "await_payment"
-    object params extends Params {
+  object AwaitPayment extends ApiCall {
+    val apiCall = "await_payment"
+    def getResult(inParams: ParamsMap) = checkRequired(inParams).toLeft(new ApiResult)
+    val paramDef = new {
       val callParams = List("code")
-      val (code) = params
+    } with Params {
+      val (code) = callParams
       val result = List("result")
     }
   }
 
-  object AcceptTestPayment extends ApiUrl {
-    val url = "accept_test_payment"
-    object params extends Params {
+  object AcceptTestPayment extends ApiCall {
+    val apiCall = "accept_test_payment"
+    def getResult(inParams: ParamsMap) = checkRequired(inParams).toLeft(new ApiResult)
+    val paramDef = new {
       val callParams = List("code")
-      val (code) = params
+    } with Params {
+      val (code) = callParams
       val result = List("result")
     }
   }
 
-  object DeclineTestPayment extends ApiUrl {
-    val url = "decline_test_payment"
-    object params extends Params {
+  object DeclineTestPayment extends ApiCall {
+    val apiCall = "decline_test_payment"
+    def getResult(inParams: ParamsMap) = checkRequired(inParams).toLeft(new ApiResult)
+    val paramDef = new {
       val callParams = List("code")
-      val (code) = params
+    } with Params {
+      val (code) = callParams
       val result = List("result")
     }
   }
