@@ -47,7 +47,7 @@ package object api {
     val paramDef = new {
       val callParams = List("code")
     } with Params {
-      val (code) = callParams
+      val List(code) = callParams
       val result = List("result")
     }
   }
@@ -58,7 +58,7 @@ package object api {
     val paramDef = new {
       val callParams = List("code")
     } with Params {
-      val (code) = callParams
+      val List(code) = callParams
       val result = List("result")
     }
   }
@@ -69,7 +69,7 @@ package object api {
     val paramDef = new {
       val callParams = List("code")
     } with Params {
-      val (code) = callParams
+      val List(code) = callParams
       val result = List("result")
     }
   }
