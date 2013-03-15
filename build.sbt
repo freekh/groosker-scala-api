@@ -7,6 +7,8 @@ version := "1.1.1-SNAPSHOT"
 
 organization := "com.groosker"
 
+scalaVersion := "2.9.1"
+
 resolvers ++= Seq (
         "erisRepo" at "http://88.198.24.198/maven/", 
         ScalaToolsSnapshots, ScalaToolsReleases, DefaultMavenRepository,
