@@ -41,6 +41,20 @@ package object api {
     }
   }
 
+  object Quote extends ApiCall {
+    val apiCall = "quote"
+    def getResult(inParams: ParamsMap) = checkRequired(inParams).toLeft(new ApiResult)
+    val paramDef = new {
+      override val commonParams = List.empty
+      val callParams = List("currency")
+    } with Params {
+      val List(currency) = callParams
+      val result = List("quote")
+      val List(quote) = result
+    }
+  }
+
+  
   object AwaitPayment extends ApiCall {
     val apiCall = "await_payment"
     def getResult(inParams: ParamsMap) = checkRequired(inParams).toLeft(new ApiResult)

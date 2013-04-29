@@ -7,6 +7,7 @@ import scala.io.Source
 object Currency extends Enumeration {
   //type Currency = Value
   val BTC, USD, EUR, GBP, CHF, NOK = Value
+  def find(currency: String) = this.values.find(currency.toUpperCase == _.toString) 
 }
 
 import java.util.{ Date, Calendar }
