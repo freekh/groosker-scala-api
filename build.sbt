@@ -3,7 +3,7 @@ import Keys._
 
 name := "Groosker Payment API"
 
-version := "1.1.4-SNAPSHOT"
+version := "1.1.5-SNAPSHOT"
 
 organization := "com.groosker"
 

@@ -37,11 +37,11 @@ sealed abstract class GrooskerAbstract {
   def secure: Boolean
 
   import Currency._
-  def createPaymentRequest(amount: BigDecimal, currency: Currency.Value, description: String, details: String): Option[PaymentRequestDetails] = {
+  def createPaymentRequest(amount: BigDecimal, currency: Currency.Value, description: String): Option[PaymentRequestDetails] = {
     val http = new Http
-    val params = RequestPayment.paramDef.params zip Seq(apiKey, version, amount.toString, currency.toString, details)
+    val params = RequestPayment.paramDef.params zip Seq(apiKey, version, amount.toString, currency.toString, description)
     val req = url(baseUrl) / RequestPayment.apiCall << params
-
+    
     http x (req >|) {
       case (200, _, y, _) =>
         val txt = Source.fromInputStream(y.get.getContent).getLines.mkString("\n")
@@ -50,6 +50,7 @@ sealed abstract class GrooskerAbstract {
         val json = parse(txt)
         Some(json.extract[PaymentRequestDetails])
       case (code, _, y, _) =>
+        println("error: "+ Source.fromInputStream(y.get.getContent).getLines.mkString("\n"))
         None
     }
   }
@@ -96,8 +97,8 @@ sealed abstract class GrooskerAbstract {
 
 }
 
-abstract class GrooskerTest extends GrooskerAbstract {
-  final val baseUrl = "http://localhost:8080/api/"
+abstract class GrooskerTest(url: String) extends GrooskerAbstract {
+  final val baseUrl = url + (if (url.endsWith("/")) "" else "/") + "api/"
   val secure = false
 }
 

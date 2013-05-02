@@ -9,11 +9,10 @@ import akka.dispatch.Future
 class GrooskerSpec extends Specification {
   "Calling SpendChart API" should {
     "return a payment id and a qr code" in {
-      val g = new GrooskerTest {
+      val g = new GrooskerTest("http://localhost:8080") {
         val apiKey = "123456789"
       }
-
-      val Some(PaymentRequestDetails(code, url)) = g.createPaymentRequest(BigDecimal(12.0), Currency.CHF, "T-shirt", "Details")
+      val Some(PaymentRequestDetails(code, url)) = g.createPaymentRequest(BigDecimal(12.0), Currency.BTC, "Tshirt")
       url must contain("/api/image/")
       url must contain(code)
       Future { Thread.sleep(5000); g.acceptTestPayment(code) }
