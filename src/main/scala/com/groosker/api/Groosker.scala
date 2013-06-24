@@ -47,7 +47,7 @@ sealed abstract class GrooskerAbstract {
   val mappingCatcher = Exception.catching(classOf[MappingException])
   def createPaymentRequest(amount: BigDecimal, currency: Currency.Value, description: String): Future[Either[String, PaymentRequestDetails]] = {
     val http = new Http
-    val params = RequestPayment.paramDef.params zip Seq(apiKey, version, "1.0", currency.toString, description)
+    val params = RequestPayment.paramDef.params zip Seq(apiKey, version, amount.toString, currency.toString, description)
     val req = url(baseUrl) / RequestPayment.apiCall << params
     Http(req > (_ match {
       case r if r.getStatusCode == 200 =>
